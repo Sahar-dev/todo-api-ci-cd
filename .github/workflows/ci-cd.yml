@@ -93,7 +93,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [quality-gates, api-tests]
     if: github.ref == 'refs/heads/master'  # Only deploy on master branch
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -102,20 +102,24 @@ jobs:
       run: |
         docker build -t todo-api:latest .
 
-    - name: Log in to Docker Hub (Optional - only if secrets exist)
-      if: ${{ secrets.DOCKERHUB_USERNAME != '' }}
+    - name: Set Docker Hub secrets to env
+      run: |
+        echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> $GITHUB_ENV
+        echo "DOCKERHUB_TOKEN=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_ENV
+
+    - name: Log in to Docker Hub (Optional)
+      if: ${{ env.DOCKERHUB_USERNAME != '' }}
       uses: docker/login-action@v2
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        username: ${{ env.DOCKERHUB_USERNAME }}
+        password: ${{ env.DOCKERHUB_TOKEN }}
 
     - name: Push Docker image (Optional)
-      if: ${{ secrets.DOCKERHUB_USERNAME != '' }}
+      if: ${{ env.DOCKERHUB_USERNAME != '' }}
       run: |
-        docker tag todo-api:latest ${{ secrets.DOCKERHUB_USERNAME }}/todo-api:latest
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/todo-api:latest
+        docker tag todo-api:latest ${{ env.DOCKERHUB_USERNAME }}/todo-api:latest
+        docker push ${{ env.DOCKERHUB_USERNAME }}/todo-api:latest
 
-    # Quality Gate 7: Production Smoke Test (placeholder)
     - name: Run final smoke tests
       run: |
         echo "🚀 Simulating deployment..."
@@ -124,10 +128,8 @@ jobs:
 
     - name: Notify success
       if: success()
-      run: |
-        echo "🎉 Pipeline completed! All quality gates passed."
+      run: echo "🎉 Pipeline completed! All quality gates passed."
         
     - name: Notify failure
       if: failure()
-      run: |
-        echo "❌ Pipeline failed! Check the quality gates above."
+      run: echo "❌ Pipeline failed! Check the quality gates above."
