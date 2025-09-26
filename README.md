@@ -2,14 +2,13 @@
 
 [![CI/CD Pipeline](https://github.com/Sahar-dev/todo-api-ci-cd/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Sahar-dev/todo-api-ci-cd/actions)
 [![Coverage](https://codecov.io/gh/Sahar-dev/todo-api-ci-cd/branch/master/graph/badge.svg)](https://codecov.io/gh/Sahar-dev/todo-api-ci-cd)
-[![Docker Build](https://img.shields.io/docker/build/sahar-dev/todo-api?label=Docker%20Build)](https://hub.docker.com/r/sahar-dev/todo-api)
+[![Docker Pulls](https://img.shields.io/docker/pulls/sahar-dev/todo-api?label=Docker%20Pulls)](https://hub.docker.com/r/sahar-dev/todo-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > **Showcase Project for QA & DevOps Engineering:**  
 > Modern CI/CD pipeline, automated tests, security gates, and container deployment — engineered for reliability and maintainability.
 
 ---
-
 ## 🚦 About This Project
 
 This repository demonstrates real-world **QA** and **DevOps** practices through a full-stack Flask Todo API, featuring:
@@ -23,6 +22,10 @@ This repository demonstrates real-world **QA** and **DevOps** practices through 
 Use this repo as a reference for professional **quality engineering** and **DevOps automation**.
 
 ---
+## 📋 Prerequisites
+- Docker & Docker Compose
+- Python 3.8+ (for local development)
+- k6 (for performance testing)
 
 ## 🛡️ CI/CD Quality Gates
 
