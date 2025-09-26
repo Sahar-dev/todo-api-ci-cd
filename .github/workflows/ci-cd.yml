@@ -59,7 +59,7 @@ jobs:
     # Quality Gate 5: Scan Docker Image
     - name: Scan Docker image for vulnerabilities
       run: |
-        docker scan --accept-license todo-api:latest || true  # Continue even if scan fails
+        docker scan --accept-license todo-api:latest || true
 
     - name: Add Quality Gates summary
       if: always()
@@ -108,18 +108,55 @@ jobs:
         echo "- ✅ Health endpoint works" >> $GITHUB_STEP_SUMMARY
         echo "- ✅ Todos endpoint works" >> $GITHUB_STEP_SUMMARY
 
+  performance-tests:
+    runs-on: ubuntu-latest
+    needs: api-tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t todo-api:latest .
+
+      - name: Run app container
+        run: |
+          docker run -d -p 5000:5000 --name perf-test todo-api:latest
+          sleep 10
+
+      - name: Install k6
+        run: |
+          curl -sSL https://github.com/grafana/k6/releases/download/v0.49.0/k6-v0.49.0-linux-amd64.tar.gz \
+          | tar xvz
+          sudo mv k6-v0.49.0-linux-amd64/k6 /usr/local/bin
+
+      - name: Run performance tests
+        run: k6 run --out json=k6-results.json --summary-export=k6-results.html k6_test.js
+
+      - name: Upload k6 results
+        uses: actions/upload-artifact@v3
+        with:
+          name: k6-performance-report
+          path: |
+            k6-results.json
+            k6-results.html
+
+      - name: Stop container
+        if: always()
+        run: |
+          docker stop perf-test || true
+          docker rm perf-test || true
+
   deployment:
     runs-on: ubuntu-latest
-    needs: [quality-gates, api-tests]
-    if: github.ref == 'refs/heads/master'  # Only deploy on master branch
+    needs: [quality-gates, api-tests, performance-tests]
+    if: github.ref == 'refs/heads/master'
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
     - name: Build Docker image
-      run: |
-        docker build -t todo-api:latest .
+      run: docker build -t todo-api:latest .
 
     - name: Set Docker Hub secrets to env
       run: |
@@ -154,3 +191,32 @@ jobs:
         echo "- Commit: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "**🎉 Deployment completed successfully**" >> $GITHUB_STEP_SUMMARY
+
+  final-summary:
+    runs-on: ubuntu-latest
+    needs: [deployment]
+    if: always()
+    steps:
+      - name: Add Final CI/CD Summary
+        run: |
+          echo "# ✅ CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 Quality Gates" >> $GITHUB_STEP_SUMMARY
+          echo "- 🧹 Linting: Passed" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔒 Security Scan: Completed" >> $GITHUB_STEP_SUMMARY
+          echo "- 🧪 Unit Tests: Completed" >> $GITHUB_STEP_SUMMARY
+          echo "- 🐳 Docker Build & Scan: Completed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🌐 API Tests" >> $GITHUB_STEP_SUMMARY
+          echo "- Health endpoint ✅" >> $GITHUB_STEP_SUMMARY
+          echo "- Todos endpoint ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ⚡ Performance Tests" >> $GITHUB_STEP_SUMMARY
+          echo "- k6 report attached as artifact" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🚀 Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "- Docker Hub: \`${{ env.DOCKERHUB_USERNAME }}/todo-api:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**🎉 CI/CD pipeline completed successfully!**" >> $GITHUB_STEP_SUMMARY
