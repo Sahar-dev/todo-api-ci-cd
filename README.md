@@ -1,8 +1,8 @@
 # 📝 Todo API — CI/CD Quality Gates Portfolio Project
 
 [![CI/CD Pipeline](https://github.com/Sahar-dev/todo-api-ci-cd/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Sahar-dev/todo-api-ci-cd/actions)
-[![Coverage](https://codecov.io/gh/Sahar-dev/todo-api-ci-cd/branch/master/graph/badge.svg)](https://codecov.io/gh/Sahar-dev/todo-api-ci-cd)
-[![Docker Pulls](https://img.shields.io/docker/pulls/sahar-dev/todo-api?label=Docker%20Pulls)](https://hub.docker.com/r/saharmz/todo-api)
+[![Coverage](https://img.shields.io/codecov/c/github/Sahar-dev/todo-api-ci-cd/master?logo=codecov&cacheSeconds=60)](https://codecov.io/gh/Sahar-dev/todo-api-ci-cd)
+[![Docker Pulls](https://img.shields.io/docker/pulls/saharmz/todo-api?label=Docker%20Pulls&logo=docker&cacheSeconds=60)](https://hub.docker.com/r/saharmz/todo-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > **End-to-End CI/CD Demonstration — QA & DevOps Engineering**  
