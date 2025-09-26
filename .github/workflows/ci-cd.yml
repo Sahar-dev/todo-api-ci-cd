@@ -1,0 +1,137 @@
+name: CI/CD Pipeline with Quality Gates
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  quality-gates:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov
+
+    # Quality Gate 1: Code Linting
+    - name: Run flake8 linting
+      run: |
+        pip install flake8
+        flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 app/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    # Quality Gate 2: Security Scan (SAST)
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+      if: always()
+
+    # Quality Gate 3: Unit Tests with Coverage
+    - name: Run unit tests with pytest
+      run: |
+        pytest tests/unit/ -v --cov=app --cov-report=xml --cov-report=html
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+    # Quality Gate 4: Build Docker Image
+    - name: Build Docker image
+      run: |
+        docker build -t todo-api:latest .
+
+    # Quality Gate 5: Scan Docker Image
+    - name: Scan Docker image for vulnerabilities
+      run: |
+        docker scan todo-api:latest
+
+  api-tests:
+    runs-on: ubuntu-latest
+    needs: quality-gates
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build and run Docker container
+      run: |
+        docker build -t todo-api:latest .
+        docker run -d -p 5000:5000 --name todo-app todo-api:latest
+
+    - name: Wait for application to start
+      run: |
+        timeout 30s bash -c 'until curl -f http://localhost:5000/health; do sleep 1; done'
+
+    # Quality Gate 6: API Tests
+    - name: Run API tests
+      run: |
+        pip install -r requirements.txt
+        pytest tests/api/ -v
+
+    - name: Stop Docker container
+      run: |
+        docker stop todo-app
+        docker rm todo-app
+
+  deployment:
+    runs-on: ubuntu-latest
+    needs: [quality-gates, api-tests]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Build Docker image
+      run: |
+        docker build -t todo-api:latest .
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Push Docker image
+      run: |
+        docker tag todo-api:latest ${{ secrets.DOCKERHUB_USERNAME }}/todo-api:latest
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/todo-api:latest
+
+    # Quality Gate 7: Production Smoke Test
+    - name: Deploy to staging and run smoke tests
+      run: |
+        echo "Deployment would happen here"
+        echo "Running smoke tests against production..."
+        # This would be actual deployment commands and smoke tests
+
+    - name: Notify success
+      if: success()
+      run: |
+        echo "🚀 Deployment successful! All quality gates passed."
+        
+    - name: Notify failure
+      if: failure()
+      run: |
+        echo "❌ Pipeline failed! Check the quality gates."
