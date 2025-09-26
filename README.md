@@ -2,7 +2,7 @@
 
 [![CI/CD Pipeline](https://github.com/Sahar-dev/todo-api-ci-cd/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Sahar-dev/todo-api-ci-cd/actions)
 [![Coverage](https://codecov.io/gh/Sahar-dev/todo-api-ci-cd/branch/master/graph/badge.svg)](https://codecov.io/gh/Sahar-dev/todo-api-ci-cd)
-[![Docker Pulls](https://img.shields.io/docker/pulls/sahar-dev/todo-api?label=Docker%20Pulls)](https://hub.docker.com/r/sahar-dev/todo-api)
+[![Docker Pulls](https://img.shields.io/docker/pulls/sahar-dev/todo-api?label=Docker%20Pulls)](https://hub.docker.com/r/saharmz/todo-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > **End-to-End CI/CD Demonstration — QA & DevOps Engineering**  
