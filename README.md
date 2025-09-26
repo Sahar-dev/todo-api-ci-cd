@@ -20,7 +20,7 @@ This repository demonstrates real-world **QA** and **DevOps** practices through 
 - **Containerization:** Docker & Docker Compose for reproducible environments.
 - **Quality Reporting:** Code coverage, performance reports, and pipeline summaries.
 
-Use this repo as a reference for professional **quality engineering** and **DevOps automation**.
+Use this repo as a reference for professional **quality engineering** & **DevOps automation**.
 
 ---
 
