@@ -17,6 +17,10 @@ def create_app():
     # Import models so they register with SQLAlchemy
     from . import models
 
+    # 👇 Ensure DB tables exist on startup
+    with app.app_context():
+        db.create_all()
+
     # Import routes so they register with the app
     from .routes import main as main_bp
     app.register_blueprint(main_bp)
@@ -28,13 +32,14 @@ def create_app():
         with app.app_context():
             db.create_all()
             from .models import Todo
-            if Todo.query.count() == 0:
+            if models.Todo.query.count() == 0:
                 sample_todos = [
-                    Todo(title="Learn CI/CD",
-                         description="Build a portfolio project"),
-                    Todo(title="Write tests", description="Unit and API tests"),
-                    Todo(title="Deploy application",
-                         description="Set up pipeline"),
+                    models.Todo(title="Learn CI/CD",
+                                description="Build a portfolio project"),
+                    models.Todo(title="Write tests",
+                                description="Unit and API tests"),
+                    models.Todo(title="Deploy application",
+                                description="Set up pipeline"),
                 ]
                 db.session.add_all(sample_todos)
                 db.session.commit()
