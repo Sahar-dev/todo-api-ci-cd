@@ -5,10 +5,11 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/sahar-dev/todo-api?label=Docker%20Pulls)](https://hub.docker.com/r/sahar-dev/todo-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> **Showcase Project for QA & DevOps Engineering:**  
-> Modern CI/CD pipeline, automated tests, security gates, and container deployment — engineered for reliability and maintainability.
+> **End-to-End CI/CD Demonstration — QA & DevOps Engineering**  
+> A production-style Todo API showcasing automated testing, performance validation, security gates, and container deployment. Built to demonstrate my ability to design, implement, and maintain modern CI/CD pipelines with industry best practices.
 
 ---
+
 ## 🚦 About This Project
 
 This repository demonstrates real-world **QA** and **DevOps** practices through a full-stack Flask Todo API, featuring:
@@ -22,10 +23,14 @@ This repository demonstrates real-world **QA** and **DevOps** practices through 
 Use this repo as a reference for professional **quality engineering** and **DevOps automation**.
 
 ---
+
 ## 📋 Prerequisites
+
 - Docker & Docker Compose
 - Python 3.8+ (for local development)
 - k6 (for performance testing)
+
+---
 
 ## 🛡️ CI/CD Quality Gates
 
@@ -67,6 +72,28 @@ Performance scripts: `tests/performance/k6_test.js`.
 - **CI/CD:** GitHub Actions
 - **Containerization:** Docker, Docker Compose
 - **Reporting:** Codecov, workflow summaries
+
+---
+
+## ⚖️ Design Decisions & Demo Considerations
+
+This project is tailored for **portfolio demonstration**, so a few trade-offs were made intentionally:
+
+- **Performance thresholds** in k6 are tuned to pass consistently in CI/CD for demo purposes.  
+  In production, stricter SLAs (e.g., `p(95)<300ms`, `<0.01 error rate`) would be enforced and could block deployment.  
+  Here, thresholds are more lenient to ensure reliable demo runs on GitHub-hosted runners.
+
+- **Security scans (Trivy, docker scan)** are integrated as quality gates.  
+  For demo continuity, high-severity vulnerabilities are not blocked.  
+  In real DevSecOps pipelines, failing scans would stop deployment until resolved.
+
+- **Ephemeral environments** are spun up in Docker inside GitHub Actions instead of cloud environments.  
+  This keeps the project lightweight, portable, and review-friendly.
+
+- **Reports & artifacts** (coverage, performance, summaries) are stored as workflow artifacts.  
+  In production, these would typically feed into monitoring dashboards (Grafana, Allure, SonarQube).
+
+👉 These choices balance **real-world awareness** with **practical demo execution**, making the project both reliable and illustrative for recruiters and interviewers.
 
 ---
 
