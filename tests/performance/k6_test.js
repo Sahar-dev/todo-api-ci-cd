@@ -19,14 +19,12 @@ export const options = {
         { duration: '30s', target: 0 },
     ],
     thresholds: {
-        // ⚠️ NOTE: Relaxed thresholds for demo purpose
-        // In a real production pipeline you’d keep these stricter.
         http_req_duration: ['p(95)<1000'],
         http_req_failed: ['rate<0.10'],
         todo_creation_duration: ['p(95)<2000'],
         todo_update_duration: ['p(95)<2000'],
         todo_delete_duration: ['p(95)<2000'],
-        todoCreationSuccessRate: ['rate>0.90'],
+        todo_creation_success_rate: ['rate>0.90'],
     },
 };
 
